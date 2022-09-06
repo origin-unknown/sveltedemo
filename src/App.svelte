@@ -1,45 +1,59 @@
 <script>
-  import svelteLogo from './assets/svelte.svg'
-  import Counter from './lib/Counter.svelte'
+	import { fade } from 'svelte/transition';
+
+	import ConfigForm from './lib/ConfigForm.svelte';
+	import GambleForm from './lib/GambleForm.svelte';
+	import { generate, probability } from './utils.js';
+
+	let bets = [],
+			dices = [],
+			config = {
+				draws: 6,
+				limit: 49
+			};
+
+	const updateConfig = (conf) => {
+		config = { ...config, ...conf };
+		bets = [];
+		dices = [];
+	}
+
+	const roll = async (nums) => {
+		bets = nums;
+		dices = config.limit == config.draws
+			? nums
+			: generate(config.draws, config.limit);
+	}
+
+	$: matches = bets.filter(b => dices.includes(b));
+	$: p = probability(config.limit, config.draws, matches.length);
 </script>
 
 <main>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="./vite.svg" class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank">
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
-  <h1>Vite + Svelte</h1>
-
-  <div class="card">
-    <Counter />
-  </div>
-
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank">SvelteKit</a>, the official Svelte app framework powered by Vite!
-  </p>
-
-  <p class="read-the-docs">
-    Click on the Vite and Svelte logos to learn more
-  </p>
+	<ConfigForm on:updateConfig={e => updateConfig(e.detail)} />
+	<GambleForm {...config} on:roll={e => roll(e.detail)} />
+	{#if bets.length === config.draws && dices.length === config.draws }
+		{#key matches}
+			{#if matches.length > 0 }
+			<p in:fade={{ delay: 350 }} out:fade={{ duration: 350 }}>
+				You hit {matches.length} number{matches.length === 1 ? '' : 's'}. ({matches})<br />
+				The probability of this is {p}%.
+			</p>
+			{:else}
+			<p in:fade={{ delay: 350 }} out:fade={{ duration: 350 }}>Oops, you lost.</p>
+			{/if}
+		{/key}
+	{/if}
 </main>
 
 <style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
-  }
+	main {
+		margin: 1.2rem auto;
+		user-select: none;
+		max-width: 576px;
+	}
+
+	:global(form) {
+		margin-bottom: 1.2rem;
+	}
 </style>
