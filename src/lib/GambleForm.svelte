@@ -34,7 +34,7 @@
         grid-template-rows: repeat({rowCount}, 32px);
       "
     >
-      <legend>Choose {draws} numbers:</legend>
+      <legend>Choose {draws} number{draws === 1 ? '' : 's'}:</legend>
       {#each Array(limit) as _, i}
       <div class="number-box">
         <input
