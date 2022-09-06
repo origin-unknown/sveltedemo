@@ -34,15 +34,16 @@
 	<GambleForm {...config} on:roll={e => roll(e.detail)} />
 	{#if bets.length === config.draws && dices.length === config.draws }
 		{#key matches}
-			{#if matches.length > 0 }
-			<p in:fade={{ delay: 350 }} out:fade={{ duration: 350 }}>
-				You hit {matches.length} number{matches.length === 1 ? '' : 's'}. ({matches})<br />
+    <p in:fade={{ delay: 350 }} out:fade={{ duration: 350 }}>
+      Numbers drawn: {dices}.<br />
+		  {#if matches.length > 0 }
+      	You hit {matches.length} number{matches.length === 1 ? '' : 's'}. ({matches})<br />
 				The probability of this is {p}%.
-			</p>
 			{:else}
-			<p in:fade={{ delay: 350 }} out:fade={{ duration: 350 }}>Oops, you lost.</p>
-			{/if}
-		{/key}
+	      Oops, you lost.
+    	{/if}
+    </p>
+  {/key}
 	{/if}
 </main>
 
